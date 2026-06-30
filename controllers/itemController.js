@@ -4,7 +4,7 @@ const db = require('../config/db');
 exports.createItem = async (req, res) => {
     try {
         const sellerId = req.user.id; // Pulled from your authMiddleware token array
-        const { title, price, category, condition, location } = req.body;
+        const { title, price, category, condition, location, description } = req.body;
 
         //  CAPTURE THE LIVE CLOUDINARY URL DIRECTLY FROM MULTER
         let image_url = null;
@@ -14,12 +14,12 @@ exports.createItem = async (req, res) => {
         }
 
         const insertQuery = `
-            INSERT INTO items (title, price, category, condition, location, image_url, seller_id)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            INSERT INTO items (title, price, category, condition, location, image_url, seller_id, description)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             RETURNING *
         `;
         
-        const values = [title, price, category, condition, location, image_url, sellerId];
+        const values = [title, price, category, condition, location, image_url, sellerId, description];
         const result = await db.query(insertQuery, values);
 
         res.status(201).json({ message: "Listing created successfully!", item: result.rows[0] });
@@ -129,7 +129,7 @@ exports.updateItem = async (req, res) => {
     try {
         const itemId = req.params.id;
         const sellerId = req.user.id;
-        const { title, price, category, condition, location, existing_image_url } = req.body;
+        const { title, price, category, condition, location, description, existing_image_url } = req.body;
 
         // 1. Verify item ownership
         const verifyResult = await db.query('SELECT * FROM items WHERE id = $1', [itemId]);
