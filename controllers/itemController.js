@@ -6,11 +6,11 @@ exports.createItem = async (req, res) => {
         const sellerId = req.user.id; // Pulled from your authMiddleware token array
         const { title, price, category, condition, location } = req.body;
 
-        // 🚀 CAPTURE LOCAL FILE PATH IF UPLOADED, OTHERWISE FALLBACK TO NULL
+        //  CAPTURE THE LIVE CLOUDINARY URL DIRECTLY FROM MULTER
         let image_url = null;
         if (req.file) {
-            // This saves a clean structural identifier like "uploads/1717320000000-phone.jpg"
-            image_url = req.file.path.replace(/\\/g, '/'); 
+            // req.file.path now contains the permanent https:// secure cloud link!
+            image_url = req.file.path; 
         }
 
         const insertQuery = `
