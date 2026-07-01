@@ -1,10 +1,17 @@
 const db = require('../config/db');
 
+
 // 1. POST A NEW ITEM (Seller Action)
 exports.createItem = async (req, res) => {
     try {
-        const sellerId = req.user.id; // Pulled from your authMiddleware token array
-        const { title, price, category, condition, location, description } = req.body;
+        const sellerId = req.user.id; // Pulled from  authMiddleware token array
+        
+        // CHANGE: Changed 'const' to 'let' so to modify these values safely
+        let { title, price, category, condition, location, description } = req.body;
+
+        // SANITIZATION BLOCK: Force uppercase formatting and trim whitespace
+        if (condition) condition = condition.trim().toUpperCase();
+        if (description) description = description.trim();
 
         //  CAPTURE THE LIVE CLOUDINARY URL DIRECTLY FROM MULTER
         let image_url = null;
@@ -139,18 +146,19 @@ exports.updateItem = async (req, res) => {
         //  2. DETERMINE IMAGE PATH DIRECTION:
         let image_url = verifyResult.rows[0].image_url; // Default to existing database record
         if (req.file) {
-            image_url = req.file.path.replace(/\\/g, '/'); // If a fresh file is chosen, overwrite it!
+           // image_url = req.file.path.replace(/\\/g, '/'); // If a fresh file is chosen, overwrite it!
+           image_url = req.file.path; // Read the cloud URL string directly!
         } else if (existing_image_url === '') {
             image_url = null; // Cleared completely
         }
 
         const updateQuery = `
             UPDATE items 
-            SET title = $1, price = $2, category = $3, condition = $4, location = $5, image_url = $6
-            WHERE id = $7 AND seller_id = $8
+            SET title = $1, price = $2, category = $3, condition = $4, location = $5, image_url = $6, description = $7
+            WHERE id = $8 AND seller_id = $9
             RETURNING *
         `;
-        const values = [title, price, category, condition, location, image_url, itemId, sellerId];
+        const values = [title, price, category, condition, location, image_url, description, itemId, sellerId];
         const result = await db.query(updateQuery, values);
 
         res.json({ message: "Listing updated successfully!", item: result.rows[0] });
