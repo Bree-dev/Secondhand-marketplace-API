@@ -10,8 +10,15 @@ exports.createItem = async (req, res) => {
         let { title, price, category, condition, location, description } = req.body;
 
         // SANITIZATION BLOCK: Force uppercase formatting and trim whitespace
-        if (condition) condition = condition.trim().toUpperCase();
-        if (description) description = description.trim();
+        if (condition) {
+    let clean = condition.trim().toLowerCase();
+    if (clean === 'brand new') condition = 'Brand New';
+    else if (clean === 'like new') condition = 'Like New';
+    else if (clean === 'gently used') condition = 'Gently Used';
+    else if (clean === 'fairly used') condition = 'Fairly Used';
+    else condition = 'Gently Used'; // Safe fallback matching your DB options
+}
+if (description) description = description.trim();
 
         //  CAPTURE THE LIVE CLOUDINARY URL DIRECTLY FROM MULTER
         let image_url = null;
