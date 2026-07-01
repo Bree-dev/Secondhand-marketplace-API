@@ -6,7 +6,7 @@ exports.createItem = async (req, res) => {
     try {
         const sellerId = req.user.id; // Pulled from  authMiddleware token array
         
-        // CHANGE: Changed 'const' to 'let' so to modify these values safely
+        // CHANGE: Changed 'const' to 'let' so  modify these values safely
         let { title, price, category, condition, location, description } = req.body;
 
         // SANITIZATION BLOCK: Force uppercase formatting and trim whitespace
