@@ -9,15 +9,17 @@ exports.createItem = async (req, res) => {
         // CHANGE: Changed 'const' to 'let' so  modify these values safely
         let { title, price, category, condition, location, description } = req.body;
 
-        // SANITIZATION BLOCK: Force uppercase formatting and trim whitespace
+    // SANITIZATION BLOCK: Force proper case formatting based on lowercase check
         if (condition) {
-    let clean = condition.trim().toLowerCase();
-    if (clean === 'brand new') condition = 'Brand New';
-    else if (clean === 'like new') condition = 'Like New';
-    else if (clean === 'gently used') condition = 'Gently Used';
-    else if (clean === 'fairly used') condition = 'Fairly Used';
-    else condition = 'Gently Used'; // Safe fallback matching your DB options
-}
+            let clean = condition.trim().toLowerCase();
+            if (clean === 'brand new') condition = 'Brand New';
+            else if (clean === 'like new') condition = 'Like New';
+            else if (clean === 'gently used') condition = 'Gently Used';
+            else if (clean === 'fairly used') condition = 'Fairly Used';
+            else condition = 'Gently Used'; // Safe fallback matching your DB options
+        } else {
+            condition = 'Gently Used'; // Fallback if condition is missing entirely
+        }
 if (description) description = description.trim();
 
         //  CAPTURE THE LIVE CLOUDINARY URL DIRECTLY FROM MULTER
